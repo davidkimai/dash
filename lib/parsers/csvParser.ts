@@ -52,7 +52,8 @@ export async function parseCSV(file: File): Promise<ParseResult> {
         Papa.parse<CSVRow>(text, {
           header: true,
           skipEmptyLines: true,
-          transformHeader: (header) => header.trim(),
+          // Don't trim headers - preserve original column names (some have trailing spaces)
+          // transformHeader: (header) => header.trim(),
           transform: (value) => value.trim(),
           complete: (results) => {
             const parseTime = performance.now() - startTime;
