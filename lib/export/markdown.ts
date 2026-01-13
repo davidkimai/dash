@@ -1,0 +1,162 @@
+import { ContributorStats, CategoryStats, GlobalMetrics } from '@/types/analytics.types';
+
+/**
+ * Generate Markdown executive summary report
+ */
+export function generateMarkdownSummary(
+  contributors: ContributorStats[],
+  categories: CategoryStats[],
+  globalMetrics: GlobalMetrics
+): string {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  const lines: string[] = [];
+
+  // Title and metadata
+  lines.push('# Blue Team Analytics Dashboard');
+  lines.push('## Executive Summary Report');
+  lines.push('');
+  lines.push(`**Generated:** ${dateStr}`);
+  lines.push(`**Report Period:** Current snapshot`);
+  lines.push('');
+  lines.push('---');
+  lines.push('');
+
+  // Key metrics
+  lines.push('## 📊 Key Metrics');
+  lines.push('');
+  lines.push('| Metric | Value |');
+  lines.push('|--------|-------|');
+  lines.push(`| Total Submissions | ${globalMetrics.totalSubmissions.toLocaleString()} |`);
+  lines.push(`| Active Contributors | ${globalMetrics.totalContributors} |`);
+  lines.push(`| Categories Covered | ${globalMetrics.totalCategories} |`);
+  lines.push(
+    `| Overall Deflection Rate | **${(globalMetrics.overallDeflectionRate * 100).toFixed(1)}%** |`
+  );
+  lines.push(
+    `| Avg Submissions/Contributor | ${globalMetrics.avgSubmissionsPerContributor.toFixed(0)} |`
+  );
+  lines.push(
+    `| Category Balance Score | ${globalMetrics.categoryBalanceScore.toFixed(1)}/100 |`
+  );
+  lines.push('');
+
+  // Top performers
+  lines.push('## 🏆 Top Performers');
+  lines.push('');
+  const topPerformers = contributors.slice(0, 5);
+  topPerformers.forEach((c, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
+    lines.push(
+      `${medal} **Rank ${c.rank}** - Score: ${c.compositeScore.toFixed(1)} | Submissions: ${c.totalSubmissions} | Quality: ${(c.deflectionRate * 100).toFixed(1)}%`
+    );
+  });
+  lines.push('');
+
+  // Category insights
+  lines.push('## 📈 Category Distribution');
+  lines.push('');
+  lines.push('Top 10 categories by volume:');
+  lines.push('');
+  const topCategories = [...categories].sort((a, b) => b.count - a.count).slice(0, 10);
+  topCategories.forEach((cat, i) => {
+    lines.push(`${i + 1}. **${cat.name}** - ${cat.count} submissions (${cat.percentage.toFixed(1)}%)`);
+  });
+  lines.push('');
+
+  // Quality analysis
+  lines.push('## ✅ Quality Analysis');
+  lines.push('');
+  const deflectionRate = globalMetrics.overallDeflectionRate * 100;
+  let qualityAssessment = '';
+  if (deflectionRate >= 75) {
+    qualityAssessment = '**Excellent** - Team consistently achieves high deflection rates';
+  } else if (deflectionRate >= 50) {
+    qualityAssessment = '**Good** - Solid performance with room for improvement';
+  } else if (deflectionRate >= 25) {
+    qualityAssessment = '**Fair** - Consider additional training or strategy refinement';
+  } else {
+    qualityAssessment = '**Needs Attention** - Significant improvement opportunity';
+  }
+  lines.push(`**Overall Assessment:** ${qualityAssessment}`);
+  lines.push('');
+  lines.push(
+    `The team achieved a **${deflectionRate.toFixed(1)}%** overall deflection rate across ${globalMetrics.totalSubmissions.toLocaleString()} submissions.`
+  );
+  lines.push('');
+
+  // Coverage analysis
+  const balanceScore = globalMetrics.categoryBalanceScore;
+  let balanceAssessment = '';
+  if (balanceScore >= 80) {
+    balanceAssessment = 'Excellent coverage balance across categories';
+  } else if (balanceScore >= 60) {
+    balanceAssessment = 'Good coverage with some concentration in specific areas';
+  } else {
+    balanceAssessment = 'Coverage concentrated in few categories - consider diversifying';
+  }
+  lines.push(`**Coverage Balance:** ${balanceAssessment} (Score: ${balanceScore.toFixed(1)}/100)`);
+  lines.push('');
+
+  // Recommendations
+  lines.push('## 💡 Recommendations');
+  lines.push('');
+  
+  if (deflectionRate < 50) {
+    lines.push('- **Quality Improvement**: Focus on techniques that achieve higher deflection rates');
+  }
+  
+  if (balanceScore < 70) {
+    lines.push(
+      `- **Diversify Coverage**: Expand testing to under-represented categories (currently ${globalMetrics.totalCategories} categories covered)`
+    );
+  }
+  
+  const avgSubmissions = globalMetrics.avgSubmissionsPerContributor;
+  const variance = contributors.reduce((sum, c) => {
+    const diff = c.totalSubmissions - avgSubmissions;
+    return sum + diff * diff;
+  }, 0) / contributors.length;
+  const stdDev = Math.sqrt(variance);
+  
+  if (stdDev > avgSubmissions * 0.5) {
+    lines.push(
+      '- **Balance Workload**: Large variance in contributor submissions - consider redistribution'
+    );
+  }
+  
+  lines.push(
+    '- **Celebrate Success**: Recognize top performers to maintain engagement and motivation'
+  );
+  lines.push('');
+
+  // Footer
+  lines.push('---');
+  lines.push('');
+  lines.push('*Generated by Blue Team Analytics Dashboard - Privacy-first analytics for cybersecurity teams*');
+
+  return lines.join('\n');
+}
+
+/**
+ * Download Markdown summary as file
+ */
+export function downloadMarkdownSummary(
+  contributors: ContributorStats[],
+  categories: CategoryStats[],
+  globalMetrics: GlobalMetrics
+): void {
+  const markdown = generateMarkdownSummary(contributors, categories, globalMetrics);
+  const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `dashboard-summary-${new Date().toISOString().split('T')[0]}.md`;
+  link.click();
+  URL.revokeObjectURL(url);
+}

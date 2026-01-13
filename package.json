@@ -1,0 +1,48 @@
+{
+  "name": "blue-team-analytics-dashboard",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Privacy-first analytics dashboard for cybersecurity annotation teams",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.6.0",
+    "papaparse": "^5.4.1",
+    "encoding-japanese": "^2.2.0",
+    "recharts": "^2.13.0",
+    "framer-motion": "^11.11.0",
+    "lz-string": "^1.5.0",
+    "html2canvas": "^1.4.1",
+    "date-fns": "^4.1.0",
+    "@tanstack/react-virtual": "^3.10.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/papaparse": "^5.3.14",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^15.1.0",
+    "prettier": "^3.4.0",
+    "vitest": "^2.1.0",
+    "playwright": "^1.48.0",
+    "@playwright/test": "^1.48.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17"
+  }
+}
